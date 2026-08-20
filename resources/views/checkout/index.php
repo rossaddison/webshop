@@ -43,14 +43,14 @@ $this->setTitle('Checkout');
     ->csrf($csrf)
     ->open() ?>
 <?= Field::errorSummary($form)->header('') ?>
-<?= Field::text($form, 'name')->label('First name') ?>
-<?= Field::text($form, 'surname')->label('Last name') ?>
-<?= Field::text($form, 'email')->addInputAttributes(['type' => 'email']) ?>
-<?= Field::text($form, 'address1')->label('Address line 1') ?>
-<?= Field::text($form, 'address2')->label('Address line 2') ?>
-<?= Field::text($form, 'city') ?>
-<?= Field::text($form, 'zip')->label('Postal / ZIP code') ?>
-<?= Field::text($form, 'country') ?>
-<?= Field::text($form, 'phone') ?>
+<?= Field::text($form, 'name')->hideLabel()->placeholder('First name') ?>
+<?= Field::text($form, 'surname')->hideLabel()->placeholder('Last name') ?>
+<?= Field::text($form, 'email')->hideLabel()->placeholder('Email')->addInputAttributes(['type' => 'email']) ?>
+<?= Field::text($form, 'address1')->hideLabel()->placeholder('Address line 1') ?>
+<?= Field::text($form, 'address2')->hideLabel()->placeholder('Address line 2') ?>
+<?= Field::text($form, 'city')->hideLabel()->placeholder('City') ?>
+<?= Field::text($form, 'zip')->hideLabel()->placeholder('Postal / ZIP code') ?>
+<?= Field::text($form, 'country')->hideLabel()->placeholder('Country') ?>
+<?= Field::text($form, 'phone')->hideLabel()->placeholder('Phone') ?>
 <?= Field::submitButton()->content('Place order') ?>
 <?= new Form()->close() ?>
