@@ -8,6 +8,7 @@ use Yiisoft\Bootstrap5\Assets\BootstrapAsset;
 use Yiisoft\Html\Html;
 use Yiisoft\Html\Tag\Html as TagHtml;
 use Yiisoft\Html\Tag\Meta;
+use Yiisoft\Html\Tag\Style;
 use Yiisoft\Html\Tag\Title;
 use Yiisoft\Router\CurrentRoute;
 use Yiisoft\Router\UrlGeneratorInterface;
@@ -46,6 +47,11 @@ echo Html::openTag('head');
 echo Meta::documentEncoding('utf-8');
 echo Meta::data('viewport', 'width=device-width, initial-scale=1');
 echo new Title()->content('Webshop');
+// Bootstrap sizes almost everything (buttons, form-control padding,
+// labels, headings) in rem, so scaling the root down from the browser
+// default (16px) scales the whole page proportionally rather than
+// needing per-component overrides.
+echo new Style()->content('html { font-size: 14px; }');
 $this->head();
 echo Html::closeTag('head');
 echo Html::openTag('body');
