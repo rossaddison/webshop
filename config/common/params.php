@@ -76,9 +76,17 @@ return [
         ],
     ],
     'yiisoft/form' => [
+        // defaultTheme is a sibling of themes, not nested inside it —
+        // Yiisoft\Form\Theme\ThemeContainer::initialize() takes them as
+        // two separate arguments
+        // ($params['yiisoft/form']['themes'], $params['yiisoft/form']['defaultTheme']).
+        // Nesting it inside 'themes' (an easy mistake — ddd-template's own
+        // config has the same shape) silently falls back to the package's
+        // own default ('default', an empty unstyled theme) instead,
+        // confirmed live: every Field rendered as bare <div>/<label>/
+        // <input> with no Bootstrap classes at all until this was fixed.
+        'defaultTheme' => 'bootstrap5-vertical',
         'themes' => [
-            'defaultTheme' => 'bootstrap5-vertical',
-            'validationRulesEnricher' => new ValidationRulesEnricher(),
             'bootstrap5-vertical' => [
                 'template' => "{label}\n{input}\n{hint}\n{error}",
                 'containerClass' => 'mb-3',
@@ -99,6 +107,10 @@ return [
                     ],
                 ],
                 'enrichFromValidationRules' => true,
+                // Belongs here, not at 'themes' top level — Theme's own
+                // constructor takes both this and enrichFromValidationRules
+                // as sibling per-theme params.
+                'validationRulesEnricher' => new ValidationRulesEnricher(),
             ],
         ],
     ],
