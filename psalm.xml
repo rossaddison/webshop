@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="1"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="true"
+    strictBinaryOperands="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="config" />
+        <directory name="resources/views" />
+        <directory name="src" />
+        <directory name="Tests" />
+        <file name="public/index.php"/>
+        <file name="yii"/>
+        <file name="autoload.php"/>
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+    <issueHandlers>
+        <!-- src/resources: framework-constructed via DI, never called
+             directly — router-bound controller actions, view files, route
+             arguments the hydrator resolves by reflection. Tests: test
+             methods are invoked by the test runner via reflection, the
+             same "never called directly" shape. -->
+        <PossiblyUnusedMethod>
+            <errorLevel type="suppress">
+                <directory name="src" />
+                <directory name="resources" />
+                <directory name="Tests" />
+            </errorLevel>
+        </PossiblyUnusedMethod>
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <directory name="src" />
+                <directory name="Tests" />
+            </errorLevel>
+        </UnusedClass>
+    </issueHandlers>
+</psalm>
