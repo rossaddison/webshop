@@ -33,7 +33,7 @@ final class ProductCatalogClientTest
         /** @var ClientInterface&m\MockInterface $httpClient */
         $httpClient = m::mock(ClientInterface::class);
         $httpClient->shouldReceive('sendRequest')->once()->with(m::on(
-            static fn (Request $r): bool => (string) $r->getUri() === 'https://invoice.test/en/api/products'
+            static fn (Request $r): bool => (string) $r->getUri() === 'https://invoice.test/api/products'
                 && $r->getHeaderLine('X-Api-Key') === 'secret-key',
         ))->andReturn(new Response(200, [], $body));
 
@@ -92,7 +92,7 @@ final class ProductCatalogClientTest
         /** @var ClientInterface&m\MockInterface $httpClient */
         $httpClient = m::mock(ClientInterface::class);
         $httpClient->shouldReceive('sendRequest')->once()->with(m::on(
-            static fn (Request $r): bool => (string) $r->getUri() === 'https://invoice.test/en/api/products/7',
+            static fn (Request $r): bool => (string) $r->getUri() === 'https://invoice.test/api/products/7',
         ))->andReturn(new Response(200, [], $body));
 
         $client = new ProductCatalogClient($httpClient, 'https://invoice.test', 'secret-key');

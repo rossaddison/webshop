@@ -15,6 +15,12 @@ use Psr\Http\Client\ClientInterface;
  * side for the exact request/response shape this mirrors, and
  * `docs/STOCK_MOVEMENT_LEDGER_AND_WEBSHOP_API_AUGUST_2026.md` for why the
  * response is a one-time login link rather than a bare url_key.
+ *
+ * Path is bare (`/api/orders`, not `/en/api/orders`) — see
+ * `ProductCatalogClient`'s own docblock: invoice's Locale middleware
+ * redirects the default-locale prefix away, and `sendRequest()` doesn't
+ * follow redirects, so the `/en/` form would always fail closed here too
+ * (confirmed live against a real invoice instance).
  */
 final readonly class OrderApiClient
 {
@@ -36,7 +42,7 @@ final readonly class OrderApiClient
     {
         $request = new Request(
             'POST',
-            $this->baseUrl . '/en/api/orders',
+            $this->baseUrl . '/api/orders',
             ['X-Api-Key' => $this->apiKey, 'Content-Type' => 'application/json'],
             json_encode(['customer' => $customer, 'items' => $items], JSON_THROW_ON_ERROR),
         );

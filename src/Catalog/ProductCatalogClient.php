@@ -16,12 +16,14 @@ use Psr\Http\Client\ClientInterface;
  * crashed page.
  *
  * `X-Api-Key` matches `App\Middleware\ApiKeyAuthMiddleware` on the
- * invoice side exactly. The `/en/` path segment is deliberate, not an
- * oversight — invoice wraps its entire route collection in
- * `Group::create('/{_language}')`, and relying on its Locale middleware
- * to redirect a bare `/api/products` request has bitten this exact app
- * before (see invoice's own TrueLayer webhook debugging history), so the
- * full path is always requested directly.
+ * invoice side exactly. The path is deliberately bare (`/api/products`,
+ * not `/en/api/products`) — confirmed live: invoice's own Locale
+ * middleware 302-redirects the `en` (default-locale) prefix *away*,
+ * same behaviour this app's own Locale middleware has for its own
+ * routes. `sendRequest()` doesn't follow redirects, so requesting the
+ * `/en/` form here would always come back as a 302 and fail closed to
+ * an empty catalog — caught by live-testing against a real invoice
+ * instance, not something the mocked-HTTP unit tests could have shown.
  */
 final readonly class ProductCatalogClient
 {
@@ -35,7 +37,7 @@ final readonly class ProductCatalogClient
     /** @return list<Product> */
     public function listProducts(): array
     {
-        $decoded = $this->getJson('/en/api/products');
+        $decoded = $this->getJson('/api/products');
         if (!is_array($decoded)) {
             return [];
         }
@@ -57,7 +59,7 @@ final readonly class ProductCatalogClient
         }
 
         /** @var mixed $decoded */
-        $decoded = $this->getJson('/en/api/products/' . $id);
+        $decoded = $this->getJson('/api/products/' . $id);
         return is_array($decoded) ? Product::fromApiResponse($decoded) : null;
     }
 

@@ -43,7 +43,7 @@ final class OrderApiClientTest
         $httpClient = m::mock(ClientInterface::class);
         $httpClient->shouldReceive('sendRequest')->once()->with(m::on(
             static function (Request $r): bool {
-                if ((string) $r->getUri() !== 'https://invoice.test/en/api/orders') {
+                if ((string) $r->getUri() !== 'https://invoice.test/api/orders') {
                     return false;
                 }
                 if ($r->getHeaderLine('X-Api-Key') !== 'secret-key') {
