@@ -18,20 +18,30 @@ final readonly class Product
         public ?string $description,
         public float $price,
         public ?string $unit,
+        public ?string $imageUrl,
     ) {
     }
 
-    /** @param array<array-key, mixed> $data */
-    public static function fromApiResponse(array $data): self
+    /**
+     * @param array<array-key, mixed> $data
+     * @param string $invoiceBaseUrl Joined with the API's `image_path` (a
+     *     relative path, not an absolute URL — see
+     *     `App\Api\ProductsController::firstImagePath()`'s own docblock on
+     *     the invoice side for why) to build a full `<img src>` this app
+     *     can use directly.
+     */
+    public static function fromApiResponse(array $data, string $invoiceBaseUrl): self
     {
         /**
          * @var mixed $sku
          * @var mixed $name
          * @var mixed $description
          * @var mixed $unit
+         * @var mixed $imagePath
          */
-        [$sku, $name, $description, $unit] = [
-            $data['sku'] ?? null, $data['name'] ?? null, $data['description'] ?? null, $data['unit'] ?? null,
+        [$sku, $name, $description, $unit, $imagePath] = [
+            $data['sku'] ?? null, $data['name'] ?? null, $data['description'] ?? null,
+            $data['unit'] ?? null, $data['image_path'] ?? null,
         ];
 
         return new self(
@@ -41,6 +51,7 @@ final readonly class Product
             description: is_string($description) ? $description : null,
             price: (float) ($data['price'] ?? 0),
             unit: is_string($unit) ? $unit : null,
+            imageUrl: is_string($imagePath) && $imagePath !== '' ? $invoiceBaseUrl . $imagePath : null,
         );
     }
 

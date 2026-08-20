@@ -46,7 +46,7 @@ final readonly class ProductCatalogClient
         /** @var mixed $row */
         foreach ($decoded as $row) {
             if (is_array($row)) {
-                $products[] = Product::fromApiResponse($row);
+                $products[] = Product::fromApiResponse($row, $this->baseUrl);
             }
         }
         return $products;
@@ -60,7 +60,7 @@ final readonly class ProductCatalogClient
 
         /** @var mixed $decoded */
         $decoded = $this->getJson('/api/products/' . $id);
-        return is_array($decoded) ? Product::fromApiResponse($decoded) : null;
+        return is_array($decoded) ? Product::fromApiResponse($decoded, $this->baseUrl) : null;
     }
 
     private function getJson(string $path): mixed

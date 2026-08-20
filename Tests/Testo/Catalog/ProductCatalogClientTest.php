@@ -26,8 +26,8 @@ final class ProductCatalogClientTest
     public function listProductsMapsTheApiResponse(): void
     {
         $body = json_encode([
-            ['id' => 1, 'sku' => 'W-1', 'name' => 'Widget', 'description' => 'A widget', 'price' => 9.99, 'unit' => 'each'],
-            ['id' => 2, 'sku' => null, 'name' => 'Gadget', 'description' => null, 'price' => 4.5, 'unit' => null],
+            ['id' => 1, 'sku' => 'W-1', 'name' => 'Widget', 'description' => 'A widget', 'price' => 9.99, 'unit' => 'each', 'image_path' => '/products/widget.jpg'],
+            ['id' => 2, 'sku' => null, 'name' => 'Gadget', 'description' => null, 'price' => 4.5, 'unit' => null, 'image_path' => null],
         ], JSON_THROW_ON_ERROR);
 
         /** @var ClientInterface&m\MockInterface $httpClient */
@@ -44,7 +44,9 @@ final class ProductCatalogClientTest
         Assert::same(1, $products[0]->id);
         Assert::same('Widget', $products[0]->name);
         Assert::same(9.99, $products[0]->price);
+        Assert::same('https://invoice.test/products/widget.jpg', $products[0]->imageUrl);
         Assert::same('Gadget', $products[1]->displayName());
+        Assert::null($products[1]->imageUrl);
     }
 
     public function listProductsReturnsEmptyOnANon200Response(): void
