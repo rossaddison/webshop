@@ -15,16 +15,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # A single PHP version to start with (composer.json actually
-        # supports 8.3-8.5) — this is a young, small repo; widen the
-        # matrix once there's more surface area worth the extra CI time.
-        # ubuntu + windows both kept since local development happens on
-        # Windows.
+        # composer.json spans 8.3-8.5; 8.3 itself isn't run here (matches
+        # invoice's own matrices, which only ever run the newest couple of
+        # supported versions). ubuntu + windows both kept since local
+        # development happens on Windows.
         include:
           - os: ubuntu-latest
             php: '8.4'
+          - os: ubuntu-latest
+            php: '8.5'
           - os: windows-latest
             php: '8.4'
+          - os: windows-latest
+            php: '8.5'
 
     steps:
       - name: Checkout

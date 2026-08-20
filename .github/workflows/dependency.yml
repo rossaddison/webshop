@@ -17,14 +17,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # A single PHP version to start with, same reasoning as ci.yml's
-        # own matrix note — widen once there's more surface area to
-        # justify it. No Alpine leg either, unlike invoice's own
-        # invoice_dependency.yml — that exists there because invoice
-        # itself targets an Alpine deployment; webshop doesn't yet.
+        # composer.json spans 8.3-8.5; same "newest couple of versions,
+        # not the whole range" reasoning as ci.yml's own matrix note. No
+        # Alpine leg either, unlike invoice's own invoice_dependency.yml —
+        # that exists there because invoice itself targets an Alpine
+        # deployment; webshop doesn't yet.
         include:
           - os: ubuntu-latest
             php: '8.4'
+          - os: ubuntu-latest
+            php: '8.5'
 
     steps:
       - name: Checkout

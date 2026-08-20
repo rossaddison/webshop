@@ -17,12 +17,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # A single PHP version to start with, same reasoning as ci.yml's
-        # own matrix note — widen once there's more surface area to
-        # justify it.
+        # composer.json spans 8.3-8.5; same "newest couple of versions,
+        # not the whole range" reasoning as ci.yml's own matrix note.
         include:
           - os: ubuntu-latest
             php: '8.4'
+          - os: ubuntu-latest
+            php: '8.5'
 
     steps:
       - name: Checkout
