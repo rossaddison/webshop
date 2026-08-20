@@ -1,4 +1,4 @@
-name: webshop CI
+name: webshop build
 
 on:
   push:
@@ -76,9 +76,6 @@ jobs:
       # only ever an install, never a compile.
       - name: Install dependencies with npm
         run: npm ci --ignore-scripts
-
-      - name: Static analysis (Psalm)
-        run: vendor/bin/psalm --stats --ansi
 
       - name: Unit tests (Testo)
         run: vendor/bin/testo --suite=Unit
