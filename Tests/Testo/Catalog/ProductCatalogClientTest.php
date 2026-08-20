@@ -26,8 +26,8 @@ final class ProductCatalogClientTest
     public function listProductsMapsTheApiResponse(): void
     {
         $body = json_encode([
-            ['id' => 1, 'sku' => 'W-1', 'name' => 'Widget', 'description' => 'A widget', 'price' => 9.99, 'unit' => 'each', 'image_path' => '/products/widget.jpg'],
-            ['id' => 2, 'sku' => null, 'name' => 'Gadget', 'description' => null, 'price' => 4.5, 'unit' => null, 'image_path' => null],
+            ['id' => 1, 'sku' => 'W-1', 'name' => 'Widget', 'description' => 'A widget', 'price' => 9.99, 'unit' => 'each', 'image_path' => '/products/widget.jpg', 'family' => 'Input Devices', 'category' => 'Computing', 'subcategory' => 'Peripherals'],
+            ['id' => 2, 'sku' => null, 'name' => 'Gadget', 'description' => null, 'price' => 4.5, 'unit' => null, 'image_path' => null, 'family' => null, 'category' => null, 'subcategory' => null],
         ], JSON_THROW_ON_ERROR);
 
         /** @var ClientInterface&m\MockInterface $httpClient */
@@ -45,8 +45,14 @@ final class ProductCatalogClientTest
         Assert::same('Widget', $products[0]->name);
         Assert::same(9.99, $products[0]->price);
         Assert::same('https://invoice.test/products/widget.jpg', $products[0]->imageUrl);
+        Assert::same('Input Devices', $products[0]->family);
+        Assert::same('Computing', $products[0]->category);
+        Assert::same('Peripherals', $products[0]->subcategory);
         Assert::same('Gadget', $products[1]->displayName());
         Assert::null($products[1]->imageUrl);
+        Assert::null($products[1]->family);
+        Assert::null($products[1]->category);
+        Assert::null($products[1]->subcategory);
     }
 
     public function listProductsReturnsEmptyOnANon200Response(): void

@@ -19,6 +19,9 @@ final readonly class Product
         public float $price,
         public ?string $unit,
         public ?string $imageUrl,
+        public ?string $family,
+        public ?string $category,
+        public ?string $subcategory,
     ) {
     }
 
@@ -38,10 +41,14 @@ final readonly class Product
          * @var mixed $description
          * @var mixed $unit
          * @var mixed $imagePath
+         * @var mixed $family
+         * @var mixed $category
+         * @var mixed $subcategory
          */
-        [$sku, $name, $description, $unit, $imagePath] = [
+        [$sku, $name, $description, $unit, $imagePath, $family, $category, $subcategory] = [
             $data['sku'] ?? null, $data['name'] ?? null, $data['description'] ?? null,
             $data['unit'] ?? null, $data['image_path'] ?? null,
+            $data['family'] ?? null, $data['category'] ?? null, $data['subcategory'] ?? null,
         ];
 
         return new self(
@@ -52,6 +59,9 @@ final readonly class Product
             price: (float) ($data['price'] ?? 0),
             unit: is_string($unit) ? $unit : null,
             imageUrl: is_string($imagePath) && $imagePath !== '' ? $invoiceBaseUrl . $imagePath : null,
+            family: is_string($family) ? $family : null,
+            category: is_string($category) ? $category : null,
+            subcategory: is_string($subcategory) ? $subcategory : null,
         );
     }
 

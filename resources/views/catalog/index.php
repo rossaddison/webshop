@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Catalog\Product;
+use App\Catalog\ProductFilter;
 use Yiisoft\Bootstrap5\Carousel;
 use Yiisoft\Bootstrap5\CarouselItem;
 use Yiisoft\Html\Html;
@@ -15,6 +16,12 @@ use Yiisoft\View\WebView;
  * @var WebView $this
  * @var UrlGeneratorInterface $urlGenerator
  * @var list<Product> $products
+ * @var ProductFilter $filter
+ * @var list<string> $categoryOptions
+ * @var list<string> $subcategoryOptions
+ * @var list<string> $familyOptions
+ * @var float|null $catalogMinPrice
+ * @var float|null $catalogMaxPrice
  */
 
 // $this->setTitle() must be the first statement after the docblock —
@@ -68,24 +75,103 @@ $renderTile = function (Product $product) use ($urlGenerator, $placeholderSvg, $
         ->encode(false)
         ->render();
 };
-?>
-<h1 class="mb-4">Products</h1>
-<?php if ($products === []): ?>
-    <p class="text-muted">No products available right now.</p>
-<?php else: ?>
-<?php
-$items = [];
-foreach (array_chunk($products, $productsPerSlide) as $slideIndex => $slideProducts) {
-    $tiles = array_map($renderTile, $slideProducts);
 
-    $content = '<div class="bg-dark d-flex align-items-start justify-content-around gap-3 p-4">'
-        . implode('', $tiles) . '</div>';
+/**
+ * One checkbox-group `<fieldset>` for the filter sidebar — Category,
+ * Subcategory or Family. Options come from the *full* unfiltered catalog
+ * (see ProductsController::distinctValues()'s own docblock), so checking
+ * one group's box never makes another group's option disappear. Renders
+ * nothing for a group with no options at all (e.g. a storefront with no
+ * categorized products yet).
+ *
+ * @param list<string> $options
+ * @param list<string> $selected
+ */
+$renderFilterGroup = function (string $legend, string $paramName, array $options, array $selected): string {
+    if ($options === []) {
+        return '';
+    }
 
-    $items[] = CarouselItem::to(
-        content: $content,
-        active: $slideIndex === 0,
-    );
-}
-echo Carousel::widget()->items(...$items)->render();
+    $checkboxes = '';
+    /** @var list<string> $options */
+    foreach ($options as $option) {
+        $id = $paramName . '-' . md5($option);
+        $checkboxes .= '<div class="form-check">'
+            . Html::checkbox($paramName . '[]', $option, ['id' => $id, 'class' => 'form-check-input'])
+                ->checked(in_array($option, $selected, true))
+                ->render()
+            . '<label class="form-check-label" for="' . Html::encode($id) . '">'
+                . Html::encode($option) . '</label>'
+            . '</div>';
+    }
+
+    return '<fieldset class="mb-3"><legend class="h6">' . Html::encode($legend) . '</legend>'
+        . $checkboxes . '</fieldset>';
+};
 ?>
-<?php endif; ?>
+<div class="row">
+    <aside class="col-md-3 mb-4">
+        <h2 class="h6 mb-3">Filters</h2>
+        <?= Html::openTag('form', ['method' => 'get', 'action' => $urlGenerator->generate('catalog/index')]) ?>
+        <fieldset class="mb-3">
+            <legend class="h6">Price</legend>
+            <div class="d-flex align-items-center gap-2">
+                <?= Html::input(
+                    'number',
+                    'min_price',
+                    $filter->minPrice !== null ? (string) $filter->minPrice : null,
+                    [
+                        'class' => 'form-control form-control-sm',
+                        'placeholder' => $catalogMinPrice !== null ? number_format($catalogMinPrice, 2) : 'Min',
+                        'min' => '0',
+                        'step' => '0.01',
+                        'aria-label' => 'Minimum price',
+                    ],
+                ) ?>
+                <span class="text-muted">–</span>
+                <?= Html::input(
+                    'number',
+                    'max_price',
+                    $filter->maxPrice !== null ? (string) $filter->maxPrice : null,
+                    [
+                        'class' => 'form-control form-control-sm',
+                        'placeholder' => $catalogMaxPrice !== null ? number_format($catalogMaxPrice, 2) : 'Max',
+                        'min' => '0',
+                        'step' => '0.01',
+                        'aria-label' => 'Maximum price',
+                    ],
+                ) ?>
+            </div>
+        </fieldset>
+        <?= $renderFilterGroup('Category', 'category', $categoryOptions, $filter->categories) ?>
+        <?= $renderFilterGroup('Subcategory', 'subcategory', $subcategoryOptions, $filter->subcategories) ?>
+        <?= $renderFilterGroup('Family', 'family', $familyOptions, $filter->families) ?>
+        <button type="submit" class="btn btn-primary btn-sm w-100 mb-2">Apply filters</button>
+        <?php if (!$filter->isEmpty()): ?>
+        <?= Html::a('Clear filters', $urlGenerator->generate('catalog/index'), ['class' => 'btn btn-link btn-sm w-100']) ?>
+        <?php endif; ?>
+        <?= Html::closeTag('form') ?>
+    </aside>
+    <section class="col-md-9">
+        <h1 class="mb-4">Products</h1>
+        <?php if ($products === []): ?>
+            <p class="text-muted">No products match those filters.</p>
+        <?php else: ?>
+        <?php
+        $items = [];
+        foreach (array_chunk($products, $productsPerSlide) as $slideIndex => $slideProducts) {
+            $tiles = array_map($renderTile, $slideProducts);
+
+            $content = '<div class="bg-dark d-flex align-items-start justify-content-around gap-3 p-4">'
+                . implode('', $tiles) . '</div>';
+
+            $items[] = CarouselItem::to(
+                content: $content,
+                active: $slideIndex === 0,
+            );
+        }
+        echo Carousel::widget()->items(...$items)->render();
+        ?>
+        <?php endif; ?>
+    </section>
+</div>
