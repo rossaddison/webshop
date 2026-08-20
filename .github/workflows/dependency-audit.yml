@@ -1,0 +1,57 @@
+name: Dependency audit
+
+on:
+  schedule:
+    # Weekly at 21:00 UTC on Thursday — same slot as rossaddison/invoice's
+    # own php-cve-check.yml.
+    - cron: '0 21 * * 4'
+  workflow_dispatch: {}
+
+jobs:
+  composer-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.4'
+          extensions: apcu, ctype, curl, fileinfo, filter, intl, json, mbstring, openssl
+          tools: composer:v2
+          coverage: none
+
+      - name: Set up Composer GitHub auth
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: composer config --global --auth github-oauth.github.com "$GITHUB_TOKEN"
+
+      - name: Install dependencies with composer
+        run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
+
+      # Checks composer.lock against the FriendsOfPHP/security-advisories
+      # database (Packagist's own source for `composer audit`) — no extra
+      # tool or external API call needed.
+      - name: Run composer audit
+        run: composer audit --format=json > composer-audit.json || true
+
+      - name: Summarize results
+        if: always()
+        run: |
+          echo "## Dependency audit — $(date -u '+%Y-%m-%d')" >> "$GITHUB_STEP_SUMMARY"
+          if [ -s composer-audit.json ] && [ "$(jq '.advisories | length' composer-audit.json)" != "0" ]; then
+            echo "⚠️ Vulnerabilities found — see job logs / composer-audit.json" >> "$GITHUB_STEP_SUMMARY"
+            cat composer-audit.json
+            exit 1
+          else
+            echo "✅ No known vulnerabilities in composer.lock" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: composer-audit
+          path: composer-audit.json
+          retention-days: 30
