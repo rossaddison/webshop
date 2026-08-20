@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Cart\CartService;
+use Yiisoft\Assets\AssetManager;
+use Yiisoft\Bootstrap5\Assets\BootstrapAsset;
 use Yiisoft\Html\Html;
 use Yiisoft\Html\Tag\Html as TagHtml;
 use Yiisoft\Html\Tag\Meta;
@@ -21,12 +23,21 @@ use Yiisoft\View\WebView;
  * @var string $content
  * @var CartService $cart
  * @var Flash $flash
+ * @var AssetManager $assetManager
  */
 
 // $this->beginPage() must be the first statement after the docblock —
 // matches the ddd-template layout's own note on this Psalm-parser quirk.
 $this->beginPage();
 $cartCount = count($cart->getItems());
+
+// Published locally (node_modules/bootstrap -> public/assets) rather than
+// loaded from a CDN — a CDN dependency meant the page rendered completely
+// unstyled for anyone whose browser couldn't reach cdn.jsdelivr.net,
+// confirmed live before this fix.
+$assetManager->register(BootstrapAsset::class);
+$this->addCssFiles($assetManager->getCssFiles());
+$this->addJsFiles($assetManager->getJsFiles());
 ?>
 <!DOCTYPE html>
 <?php
@@ -35,10 +46,6 @@ echo Html::openTag('head');
 echo Meta::documentEncoding('utf-8');
 echo Meta::data('viewport', 'width=device-width, initial-scale=1');
 echo new Title()->content('Webshop');
-echo Html::tag('link', '', [
-    'rel' => 'stylesheet',
-    'href' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-]);
 $this->head();
 echo Html::closeTag('head');
 echo Html::openTag('body');
@@ -78,8 +85,6 @@ echo Html::closeTag('main');
 echo Html::openTag('footer', ['class' => 'border-top py-3 text-center text-muted small']);
 echo Html::encode('Webshop — a headless storefront for rossaddison/invoice');
 echo Html::closeTag('footer');
-
-echo Html::script('', ['src' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js']);
 
 $this->endBody();
 echo Html::closeTag('body');

@@ -1,0 +1,9 @@
+{
+  "name": "webshop",
+  "private": true,
+  "description": "Local Bootstrap 5 assets, published via yiisoft/assets — see Yiisoft\\Bootstrap5\\Assets\\BootstrapAsset. No build step of its own yet.",
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3"
+  }
+}

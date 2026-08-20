@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Yiisoft\Bootstrap5\Assets\BootstrapAsset;
-use Yiisoft\Bootstrap5\Assets\BootstrapCdnAsset;
 use Yiisoft\ErrorHandler\Middleware\ErrorCatcher;
 use Yiisoft\RequestProvider\RequestCatcherMiddleware;
 use Yiisoft\Router\Middleware\Router;
@@ -29,15 +27,16 @@ return [
         Router::class,
     ],
 
-    // Content-Security-Policy directives. jsdelivr.net is allowlisted for
-    // the Bootstrap 5 CDN assets, same trade-off as ddd-template's own
-    // shell layout — drop this once bundled local assets replace the CDN.
+    // Content-Security-Policy directives. Bootstrap is published locally
+    // (Yiisoft\Bootstrap5\Assets\BootstrapAsset, from node_modules into
+    // public/assets) rather than loaded from a CDN, so no third-party
+    // script-src/style-src/font-src allowlisting is needed.
     'csp' => [
         'policy' => implode('; ', [
             "default-src 'self'",
-            "script-src 'self' https://cdn.jsdelivr.net",
-            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-            "font-src 'self' https://cdn.jsdelivr.net",
+            "script-src 'self'",
+            "style-src 'self' 'unsafe-inline'",
+            "font-src 'self'",
             "img-src 'self' data: blob:",
             "connect-src 'self'",
             "frame-src 'self'",
@@ -75,17 +74,5 @@ return [
     ],
     'yiisoft/widget' => [
         'defaultTheme' => 'bootstrap5',
-    ],
-    'yiisoft/assets' => [
-        'assetManager' => [
-            'customizedBundles' => [
-                BootstrapAsset::class => [
-                    'css' => [],
-                ],
-                BootstrapCdnAsset::class => [
-                    'css' => [],
-                ],
-            ],
-        ],
     ],
 ];
