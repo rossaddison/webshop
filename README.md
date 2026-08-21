@@ -9,7 +9,9 @@ local database of its own. Product catalog and checkout are proxied
 live to `invoice`'s API; the cart lives in session. See
 [`docs/DESIGN.md`](docs/DESIGN.md) for the full design (note: written
 before most of what's below, some details there — the `/en/api/...`
-path in particular — are now out of date).
+path in particular — are now out of date), or
+[`docs/WEBSHOP_DATA_FLOW_AUGUST_2026.md`](docs/WEBSHOP_DATA_FLOW_AUGUST_2026.md)
+for a diagram of how data actually moves through it.
 
 ## Setup
 
